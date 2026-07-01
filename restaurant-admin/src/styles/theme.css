@@ -1,0 +1,204 @@
+@custom-variant dark (&:is(.dark *));
+
+@import "tailwindcss";
+
+:root {
+  --font-size: 14px; /* High information density base size */
+  
+  /* Foundation Colors */
+  --background: #f8fafc; /* Sleek cool off-white */
+  --foreground: #0f172a;
+  
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  
+  --primary: #0f172a; /* Slate 900 for Primary actions */
+  --primary-foreground: #f8fafc;
+  
+  --secondary: #f1f5f9; /* Slate 100 */
+  --secondary-foreground: #0f172a;
+  
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b; /* Slate 500 */
+  
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  --border: #e2e8f0; /* Slate 200 */
+  --input: #e2e8f0;
+  --input-background: #ffffff;
+  --ring: #94a3b8; /* Slate 400 */
+  
+  /* Status Colors */
+  --status-pending: #f59e0b; /* Amber */
+  --status-pending-bg: #fef3c7;
+  --status-pending-fg: #92400e;
+  
+  --status-confirmed: #3b82f6; /* Blue */
+  --status-confirmed-bg: #dbeafe;
+  --status-confirmed-fg: #1e40af;
+  
+  --status-preparing: #8b5cf6; /* Purple */
+  --status-preparing-bg: #ede9fe;
+  --status-preparing-fg: #5b21b6;
+  
+  --status-delivery: #f97316; /* Orange */
+  --status-delivery-bg: #ffedd5;
+  --status-delivery-fg: #9a3412;
+  
+  --status-delivered: #22c55e; /* Green */
+  --status-delivered-bg: #dcfce7;
+  --status-delivered-fg: #166534;
+  
+  --status-cancelled: #ef4444; /* Red */
+  --status-cancelled-bg: #fee2e2;
+  --status-cancelled-fg: #991b1b;
+
+  --radius: 0.5rem; /* 8px rounded corners for sleekness */
+  
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+}
+
+.dark {
+  --background: #020617; /* Slate 950 */
+  --foreground: #f8fafc;
+  
+  --card: #0f172a; /* Slate 900 */
+  --card-foreground: #f8fafc;
+  
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+  
+  --primary: #f8fafc;
+  --primary-foreground: #0f172a;
+  
+  --secondary: #1e293b; /* Slate 800 */
+  --secondary-foreground: #f8fafc;
+  
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  
+  --destructive: #7f1d1d;
+  --destructive-foreground: #f8fafc;
+  
+  --border: #334155;
+  --input: #334155;
+  --input-background: #0f172a;
+  --ring: #64748b;
+  
+  /* Dark Mode Status Colors */
+  --status-pending-bg: #451a03;
+  --status-pending-fg: #fde68a;
+  
+  --status-confirmed-bg: #1e3a8a;
+  --status-confirmed-fg: #bfdbfe;
+  
+  --status-preparing-bg: #2e1065;
+  --status-preparing-fg: #ddd6fe;
+  
+  --status-delivery-bg: #431407;
+  --status-delivery-fg: #fed7aa;
+  
+  --status-delivered-bg: #052e16;
+  --status-delivered-fg: #bbf7d0;
+  
+  --status-cancelled-bg: #450a0a;
+  --status-cancelled-fg: #fecaca;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Mapping status colors */
+  --color-status-pending: var(--status-pending);
+  --color-status-pending-bg: var(--status-pending-bg);
+  --color-status-pending-fg: var(--status-pending-fg);
+  
+  --color-status-confirmed: var(--status-confirmed);
+  --color-status-confirmed-bg: var(--status-confirmed-bg);
+  --color-status-confirmed-fg: var(--status-confirmed-fg);
+  
+  --color-status-preparing: var(--status-preparing);
+  --color-status-preparing-bg: var(--status-preparing-bg);
+  --color-status-preparing-fg: var(--status-preparing-fg);
+  
+  --color-status-delivery: var(--status-delivery);
+  --color-status-delivery-bg: var(--status-delivery-bg);
+  --color-status-delivery-fg: var(--status-delivery-fg);
+  
+  --color-status-delivered: var(--status-delivered);
+  --color-status-delivered-bg: var(--status-delivered-bg);
+  --color-status-delivered-fg: var(--status-delivered-fg);
+  
+  --color-status-cancelled: var(--status-cancelled);
+  --color-status-cancelled-bg: var(--status-cancelled-bg);
+  --color-status-cancelled-fg: var(--status-cancelled-fg);
+
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
+  
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased font-sans;
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-foreground;
+  }
+
+  h1 { @apply text-3xl; }
+  h2 { @apply text-2xl; }
+  h3 { @apply text-xl; }
+  h4 { @apply text-lg; }
+  h5 { @apply text-base; }
+  
+  p, label, button, input {
+    @apply text-sm leading-relaxed;
+  }
+}
