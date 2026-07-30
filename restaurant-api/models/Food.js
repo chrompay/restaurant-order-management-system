@@ -43,6 +43,23 @@ const foodSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Menu",
             required: true
+        },
+
+        station: {
+            type: String,
+            enum: [
+                "Bakery",
+                "Beverages",
+                "Breakfast",
+                "Fryer",
+                "Grill",
+                "Legumes & Pots",
+                "Pepper Soup",
+                "Protein Prep",
+                "Rice & Grains",
+                "Swallow & Soup"
+            ],
+            default: "Grill"
         }
     },
     {

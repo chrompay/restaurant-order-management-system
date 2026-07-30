@@ -7,7 +7,10 @@ export interface User {
   _id: string;
   fullName: string;
   email: string;
-  role: "admin" | "customer";
+  role: "admin" | "customer" | "manager" | "staff" | "kitchen" | "delivery";
+  phone?: string;
+  address?: string;
+  avatar?: string;
 }
 
 export interface LoginResponse {
@@ -40,4 +43,6 @@ export interface AuthContextType {
   ) => Promise<void>;
 
   logout: () => void;
+
+  updateUser: (user: User) => void;
 }

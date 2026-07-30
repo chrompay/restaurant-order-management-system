@@ -9,6 +9,14 @@ import { Sheet, SheetContent } from "../ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb"
 import { useTheme } from "next-themes"
+import { useAuth } from "@/features/auth/hooks/useAuth"
+import { resolveAssetUrl } from "@/lib/assetUrl"
+
+function getInitials(fullName: string) {
+  const parts = fullName.trim().split(/\s+/)
+  const initials = parts.slice(0, 2).map(part => part[0] ?? "").join("")
+  return initials.toUpperCase() || "?"
+}
 
 // ----------------------------------------------------------------------------
 // Sidebar Component
@@ -19,22 +27,46 @@ interface SidebarProps {
   className?: string
 }
 
-const navItems = [
-  { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+interface NavItem {
+  name: string
+  separator?: boolean
+  icon?: typeof LayoutDashboard
+  path?: string
+  // Mirrors each page's actual `authorize(...)` gate on the backend.
+  // Undefined = no role restriction.
+  roles?: string[]
+}
+
+const navItems: NavItem[] = [
+  { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard", roles: ["admin", "manager"] },
   { separator: true, name: "Operations" },
-  { name: "Orders", icon: ShoppingBag, path: "/operations/orders" },
-  { name: "Kitchen Queue", icon: UtensilsCrossed, path: "/operations/kitchen" },
-  { name: "Delivery Queue", icon: Truck, path: "/operations/delivery" },
+  { name: "Orders", icon: ShoppingBag, path: "/operations/orders", roles: ["admin", "manager"] },
+  { name: "Kitchen Queue", icon: UtensilsCrossed, path: "/operations/kitchen", roles: ["admin", "manager", "kitchen"] },
+  { name: "Delivery Queue", icon: Truck, path: "/operations/delivery", roles: ["admin", "manager", "delivery"] },
   { separator: true, name: "Menu Management" },
-  { name: "Foods", icon: BookOpen, path: "/menu/foods" },
-  { name: "Categories", icon: Layers, path: "/menu/categories" },
+  { name: "Foods", icon: BookOpen, path: "/menu/foods", roles: ["admin"] },
+  { name: "Categories", icon: Layers, path: "/menu/categories", roles: ["admin"] },
   { separator: true, name: "" },
-  { name: "Customers", icon: Users, path: "/customers" },
-  { name: "Analytics", icon: BarChart3, path: "/analytics" },
+  { name: "Customers", icon: Users, path: "/customers", roles: ["admin", "manager"] },
+  { name: "Analytics", icon: BarChart3, path: "/analytics", roles: ["admin", "manager"] },
 ]
+
+function getVisibleNavItems(role: string | undefined): NavItem[] {
+  const allowed = navItems.filter((item) => item.separator || !item.roles || (!!role && item.roles.includes(role)));
+
+  // Drop a separator that has nothing visible following it (either another
+  // separator right after it, or the end of the list).
+  return allowed.filter((item, index) => {
+    if (!item.separator) return true;
+    const next = allowed[index + 1];
+    return !!next && !next.separator;
+  });
+}
 
 export function Sidebar({ collapsed, className }: SidebarProps) {
   const location = useLocation();
+  const { logout, user } = useAuth();
+  const visibleNavItems = getVisibleNavItems(user?.role);
 
   return (
     <div className={cn("flex flex-col h-full bg-card border-r border-border transition-all duration-300", collapsed ? "w-[72px]" : "w-64", className)}>
@@ -76,7 +108,7 @@ export function Sidebar({ collapsed, className }: SidebarProps) {
 
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-1 no-scrollbar">
-        {navItems.map((item, index) => {
+        {visibleNavItems.map((item, index) => {
           if (item.separator) {
             return (
               <div key={index} className={cn("pt-4 pb-1", collapsed ? "px-0 text-center" : "px-3")}>
@@ -123,11 +155,13 @@ export function Sidebar({ collapsed, className }: SidebarProps) {
             {!collapsed && <span className="text-sm truncate">Settings</span>}
           </div>
         </Link>
-        <div className={cn(
-          "flex items-center rounded-md transition-colors text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer",
-          collapsed ? "justify-center h-10 w-10 mx-auto" : "px-3 py-2 gap-3"
-        )}
-        title={collapsed ? "Logout" : undefined}>
+        <div
+          onClick={logout}
+          className={cn(
+            "flex items-center rounded-md transition-colors text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer",
+            collapsed ? "justify-center h-10 w-10 mx-auto" : "px-3 py-2 gap-3"
+          )}
+          title={collapsed ? "Logout" : undefined}>
           <LogOut className="w-5 h-5 shrink-0" />
           {!collapsed && <span className="text-sm truncate">Logout</span>}
         </div>
@@ -148,6 +182,7 @@ function CheckIcon({ active }: { active?: boolean }) {
 export function Header({ toggleSidebar, isMobile }: { toggleSidebar: () => void, isMobile: boolean }) {
   const { setTheme, theme } = useTheme()
   const location = useLocation()
+  const { user, logout } = useAuth()
   
   // Basic breadcrumb generation based on pathname
   const paths = location.pathname.split('/').filter(Boolean)
@@ -272,26 +307,29 @@ export function Header({ toggleSidebar, isMobile }: { toggleSidebar: () => void,
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full ml-1">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="https://i.pravatar.cc/150?u=manager" alt="Manager" />
-                <AvatarFallback>AM</AvatarFallback>
+                {user?.avatar && <AvatarImage src={resolveAssetUrl(user.avatar)} alt={user.fullName} />}
+                <AvatarFallback>{user ? getInitials(user.fullName) : "?"}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Alex Manager</p>
+                <p className="text-sm font-medium leading-none">{user?.fullName ?? "Unknown user"}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  alex@restaurant.os
+                  {user?.email}
                 </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/settings">Settings</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive focus:bg-destructive focus:text-destructive-foreground">
+            <DropdownMenuItem
+              onClick={logout}
+              className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+            >
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -30,6 +30,32 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true,
           min: 1
+        },
+
+        station: {
+          type: String,
+          enum: [
+            "Bakery",
+            "Beverages",
+            "Breakfast",
+            "Fryer",
+            "Grill",
+            "Legumes & Pots",
+            "Pepper Soup",
+            "Protein Prep",
+            "Rice & Grains",
+            "Swallow & Soup"
+          ]
+        },
+
+        notes: {
+          type: String,
+          default: ""
+        },
+
+        completed: {
+          type: Boolean,
+          default: false
         }
       }
     ],
@@ -37,6 +63,17 @@ const orderSchema = new mongoose.Schema(
     totalAmount: {
       type: Number,
       default: 0
+    },
+
+    discountAmount: {
+      type: Number,
+      default: 0
+    },
+
+    assignedRider: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Rider",
+      default: null
     },
 
     status: {

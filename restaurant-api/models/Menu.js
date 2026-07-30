@@ -10,6 +10,17 @@ const menuSchema = new mongoose.Schema(
     description: {
       type: String,
       default: ""
+    },
+
+    icon: {
+      type: String,
+      default: "utensils-crossed"
+    },
+
+    status: {
+      type: String,
+      enum: ["Active", "Draft"],
+      default: "Active"
     }
   },
   {

@@ -24,7 +24,30 @@ const loginSchema = Joi.object({
     .required()
 });
 
+const updateProfileSchema = Joi.object({
+  fullName: Joi.string()
+    .min(3)
+    .max(50),
+
+  phone: Joi.string()
+    .allow(""),
+
+  address: Joi.string()
+    .allow("")
+}).min(1);
+
+const changePasswordSchema = Joi.object({
+  currentPassword: Joi.string()
+    .required(),
+
+  newPassword: Joi.string()
+    .min(6)
+    .required()
+});
+
 module.exports = {
   registerSchema,
-  loginSchema
+  loginSchema,
+  updateProfileSchema,
+  changePasswordSchema
 };

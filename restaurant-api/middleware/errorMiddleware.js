@@ -55,6 +55,15 @@ const errorHandler = (
     });
   }
 
+  // Multer Upload Error
+  if (err.name === "MulterError") {
+    return res.status(400).json({
+      success: false,
+      status: "fail",
+      message: err.message
+    });
+  }
+
   res.status(
     err.statusCode || 500
   ).json({

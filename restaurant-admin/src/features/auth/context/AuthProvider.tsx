@@ -5,6 +5,8 @@ import {
     ReactNode,
 } from "react";
 
+import { toast } from "sonner";
+
 import {
     login as loginApi,
 } from "../api/auth.api";
@@ -15,6 +17,7 @@ import {
 } from "../types/auth.types";
 import { authStorage } from "@/services/storage/authStorage";
 import { getProfile } from "../api/auth.api";
+import { STAFF_ROLES } from "../constants";
 
 export const AuthContext =
     createContext<AuthContextType | null>(null);
@@ -51,13 +54,17 @@ export function AuthProvider({
             const jwt = response.data.token;
             const currentUser = response.data.user;
 
+            if (!STAFF_ROLES.includes(currentUser.role)) {
+                throw new Error("This portal is for staff only.");
+            }
+
             authStorage.setToken(jwt);
             authStorage.setUser(currentUser);
 
             setToken(jwt);
             setUser(currentUser);
         } catch (error) {
-            localStorage.removeItem("token");
+            authStorage.clear();
             setToken(null);
             setUser(null);
 
@@ -74,6 +81,11 @@ export function AuthProvider({
         setUser(null);
     };
 
+    const updateUser = (nextUser: User) => {
+        authStorage.setUser(nextUser);
+        setUser(nextUser);
+    };
+
     useEffect(() => {
         const restoreSession = async () => {
             const storedToken = authStorage.getToken();
@@ -84,6 +96,14 @@ export function AuthProvider({
 
             try {
                 const response = await getProfile();
+
+                if (!STAFF_ROLES.includes(response.data.role)) {
+                    authStorage.clear();
+                    setToken(null);
+                    setUser(null);
+                    toast.error("This portal is for staff only.");
+                    return;
+                }
 
                 setUser(response.data);
                 authStorage.setUser(response.data);
@@ -109,6 +129,8 @@ export function AuthProvider({
                 login,
 
                 logout,
+
+                updateUser,
             }}
         >
             {children}
